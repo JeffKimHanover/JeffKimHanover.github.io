@@ -5,6 +5,9 @@ const GRAVITY = 0.5;
 const JUMP_FORCE = -12;
 const MOVEMENT_SPEED = 5;
 
+// Add new constant for super jump
+const SUPER_JUMP_FORCE = -16; // Stronger than regular JUMP_FORCE (-12)
+
 // Add sprite image loading
 const playerSprite = new Image();
 playerSprite.src = 'jif-sprite.png';
@@ -15,15 +18,28 @@ enemySprite.src = 'gif-sprite.png';
 const peanutSprite = new Image();
 peanutSprite.src = 'peanut-sprite.png';
 
+const butterSprite = new Image();
+butterSprite.src = 'butter-sprite.png';
+
 // Add loading state
 let gameLoaded = false;
 
-// Wait for image to load before starting game
-playerSprite.onload = () => {
-    gameLoaded = true;
-    // Start the game loop once image is loaded
-    gameLoop();
-};
+// Update image loading count
+let imagesLoaded = 0;
+const requiredImages = 4; // Now we have 4 images to load
+
+function handleImageLoad() {
+    imagesLoaded++;
+    if (imagesLoaded === requiredImages) {
+        gameLoaded = true;
+        gameLoop();
+    }
+}
+
+playerSprite.onload = handleImageLoad;
+enemySprite.onload = handleImageLoad;
+peanutSprite.onload = handleImageLoad;
+butterSprite.onload = handleImageLoad;
 
 const player = {
     x: 100,
@@ -38,6 +54,7 @@ const player = {
 
 const peanuts = [];
 const obstacles = [];
+const butter = [];
 
 // Game state
 let gameRunning = true;
@@ -80,6 +97,18 @@ function spawnObstacle() {
     }
 }
 
+// Add butter spawning function
+function spawnButter() {
+    if (butter.length < 2) { // Keep max 2 butter items at a time
+        butter.push({
+            x: canvas.width + Math.random() * 300,
+            y: Math.random() * (canvas.height - 100) + 50,
+            width: 30,
+            height: 30
+        });
+    }
+}
+
 // Add function to reset game state
 function resetGame() {
     player.x = 100;
@@ -91,6 +120,7 @@ function resetGame() {
     
     obstacles.length = 0;
     peanuts.length = 0;
+    butter.length = 0;
     
     gameRunning = true;
 }
@@ -132,9 +162,15 @@ function update() {
         player.x += MOVEMENT_SPEED;
         player.facingLeft = false;
     }
-    if (keys['ArrowUp'] && !player.isJumping) {
-        player.velocityY = JUMP_FORCE;
-        player.isJumping = true;
+    // Check for both regular and super jump
+    if (!player.isJumping) {
+        if (keys[' ']) { // Spacebar
+            player.velocityY = SUPER_JUMP_FORCE;
+            player.isJumping = true;
+        } else if (keys['ArrowUp']) {
+            player.velocityY = JUMP_FORCE;
+            player.isJumping = true;
+        }
     }
 
     // Apply gravity
@@ -146,6 +182,22 @@ function update() {
         player.y = canvas.height - player.height;
         player.velocityY = 0;
         player.isJumping = false;
+    }
+
+    // Update butter
+    for (let i = butter.length - 1; i >= 0; i--) {
+        butter[i].x -= 2;
+        
+        // Collision with player
+        if (checkCollision(player, butter[i])) {
+            butter.splice(i, 1);
+            player.score += 50; // More points for butter!
+        }
+        
+        // Remove if off screen
+        if (butter[i] && butter[i].x < -30) {
+            butter.splice(i, 1);
+        }
     }
 
     // Update peanuts
@@ -182,6 +234,7 @@ function update() {
     // Spawn new elements
     if (Math.random() < 0.02) spawnPeanut();
     if (Math.random() < 0.01) spawnObstacle();
+    if (Math.random() < 0.005) spawnButter();
 }
 
 // Check collision between two rectangles
@@ -215,6 +268,11 @@ function draw() {
     } else {
         ctx.drawImage(playerSprite, player.x, player.y, player.width, player.height);
     }
+
+    // Draw butter
+    butter.forEach(butterItem => {
+        ctx.drawImage(butterSprite, butterItem.x, butterItem.y, butterItem.width, butterItem.height);
+    });
 
     // Draw peanuts (now black)
     peanuts.forEach(peanut => {
