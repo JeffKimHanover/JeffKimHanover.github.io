@@ -12,6 +12,9 @@ playerSprite.src = 'jif-sprite.png';
 const enemySprite = new Image();
 enemySprite.src = 'gif-sprite.png';
 
+const peanutSprite = new Image();
+peanutSprite.src = 'peanut-sprite.png';
+
 // Add loading state
 let gameLoaded = false;
 
@@ -214,9 +217,8 @@ function draw() {
     }
 
     // Draw peanuts (now black)
-    ctx.fillStyle = '#000000';
     peanuts.forEach(peanut => {
-        ctx.fillRect(peanut.x, peanut.y, peanut.width, peanut.height);
+        ctx.drawImage(peanutSprite, peanut.x, peanut.y, peanut.width, peanut.height);
     });
 
     // Draw obstacles (Gif sprites)

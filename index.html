@@ -3,24 +3,53 @@
 <head>
     <title>Jif's Peanut Adventure</title>
     <style>
-        canvas {
-            border: 2px solid brown;
-            display: block;
-            margin: 0 auto;
-            background-color: #87CEEB;
-        }
-        body {
+        .container {
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
             height: 100vh;
             margin: 0;
             background-color: #FFF8DC;
         }
+        
+        .title {
+            font-family: 'Arial Black', sans-serif;
+            font-size: 48px;
+            color: #8B4513;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            margin-bottom: 10px;
+        }
+        
+        .instructions {
+            font-family: Arial, sans-serif;
+            color: #5C4033;
+            text-align: center;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        
+        .instructions span {
+            font-weight: bold;
+            color: #8B4513;
+        }
+        
+        canvas {
+            border: 2px solid brown;
+            display: block;
+            background-color: #87CEEB;
+        }
     </style>
 </head>
 <body>
-    <canvas id="gameCanvas" width="800" height="400"></canvas>
+    <div class="container">
+        <h1 class="title">Jif vs Gif</h1>
+        <div class="instructions">
+            Use <span>←→</span> to move and <span>↑</span> to jump<br>
+            Collect peanuts for points and avoid the Gif jars!
+        </div>
+        <canvas id="gameCanvas" width="800" height="400"></canvas>
+    </div>
     <script src="game.js"></script>
 </body>
 </html> 
